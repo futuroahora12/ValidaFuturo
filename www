@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ValidaFuturo | Futuro Ahora</title>
+    <link rel="icon" type="image/jpeg" href="https://i.postimg.cc/hj5Yd36w/1795216639379.jpg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <style>
+        :root {
+            --theme-primary: #a855f7;
+            --theme-secondary: #3b82f6;
+            --theme-ring: rgba(168, 85, 247, 0.38);
+            --theme-glow: 0 0 20px rgba(168, 85, 247, 0.42), 0 0 10px rgba(59, 130, 246, 0.25);
+            --theme-on-action: #ffffff;
+            --theme-accent-text: #c084fc;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Outfit', sans-serif;
+            background: #060711;
+            color: #f8fafc;
+        }
+
+        html:not(.dark), html:not(.dark) body {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .phone-shell {
+            width: 100%;
+            max-width: 430px;
+            height: 100dvh;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            background: radial-gradient(circle at 15% 0%, rgba(168, 85, 247, 0.16), transparent 42%),
+                        radial-gradient(circle at 85% 12%, rgba(59, 130, 246, 0.16), transparent 45%),
+                        #0b0e1c;
+            box-shadow: 0 0 0 1px var(--theme-ring), var(--theme-glow);
+        }
+
+        html:not(.dark) .phone-shell {
+            background: radial-gradient(circle at 15% 0%, rgba(168, 85, 247, 0.10), transparent 42%),
+                        radial-gradient(circle at 85% 12%, rgba(59, 130, 246, 0.10), transparent 45%),
+                        #f8fafc;
+            box-shadow: 0 18px 40px -18px rgba(15, 23, 42, 0.25);
+        }
+
+        .glass-panel {
+            background: rgba(18, 22, 39, 0.88);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid var(--theme-ring);
+        }
+
+        html:not(.dark) .glass-panel {
+            background: rgba(255, 255, 255, 0.94);
+            border: 1px solid rgba(15, 23, 42, 0.10);
+            color: #0f172a;
+        }
+
+        .field-box {
+            background: rgba(8, 10, 20, 0.72);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #f8fafc;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        html:not(.dark) .field-box {
+            background: #f1f5f9;
+            border: 1px solid rgba(15, 23, 42, 0.14);
+            color: #0f172a;
+        }
+
+        .field-box:focus {
+            outline: none;
+            border-color: var(--theme-primary);
+            box-shadow: 0 0 0 2px var(--theme-ring);
+        }
+
+        .grad-action {
+            background: linear-gradient(135deg, var(--theme-secondary) 0%, var(--theme-primary) 100%);
+            box-shadow: var(--theme-glow);
+            color: var(--theme-on-action);
+        }
+
+        .neon-text {
+            color: var(--theme-accent-text);
+        }
+
+        html:not(.dark) .neon-text {
+            color: var(--theme-secondary);
+        }
+
+        .module-card {
+            border-radius: 20px;
+            padding: 16px 18px;
+            color: #ffffff;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            box-shadow: 0 12px 26px -12px rgba(0, 0, 0, 0.65);
+            transition: transform 0.14s ease, filter 0.14s ease;
+        }
+
+        html:not(.dark) .module-card {
+            box-shadow: 0 12px 24px -12px rgba(30, 27, 75, 0.35);
+        }
+
+        .module-card:active {
+            transform: scale(0.985);
+            filter: brightness(1.06);
+        }
+
+        @keyframes pulseLogo {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.06); }
+        }
+
+        @keyframes progress4s {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        @keyframes popWelcome {
+            0% { opacity: 0; transform: scale(0.92); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .anim-logo-pulse {
+            animation: pulseLogo 1.6s ease-in-out infinite;
+        }
+
+        .anim-barra-4s {
+            animation: progress4s 4s linear forwards;
+        }
+
+        .anim-bienvenido {
+            animation: popWelcome 0.35s ease-out forwards;
+        }
+
+        ::-webkit-scrollbar { width: 3px; height: 3px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--theme-secondary), var(--theme-primary));
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="antialiased select-none">
+
+    <div id="app" class="phone-shell"></div>
+
+    <!-- Modal de Confirmación para Enviar Datos al Admin -->
+    <div id="modalConfirmarBono" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/70 backdrop-blur-xs">
+        <div class="glass-panel rounded-3xl w-full max-w-xs overflow-hidden shadow-2xl text-center border">
+            <div class="p-5 space-y-2">
+                <div class="text-base font-black neon-text">Confirmar envío</div>
+                <p id="textoConfirmarBono" class="text-xs text-slate-700 dark:text-slate-200 leading-relaxed"></p>
+            </div>
+            <div class="grid grid-cols-2 border-t border-slate-200 dark:border-white/10 text-xs font-extrabold">
+                <button type="button" id="btnCancelarConfirmar" class="py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-white/5 dark:hover:bg-white/10 dark:text-slate-300 cursor-pointer">
+                    No
+                </button>
+                <button type="button" id="btnAceptarConfirmar" class="py-3.5 grad-action cursor-pointer">
+                    Sí
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toastValidaFuturo" class="fixed top-4 left-1/2 -translate-x-1/2 z-[60] hidden px-4 py-2.5 rounded-2xl grad-action text-xs font-extrabold shadow-2xl max-w-[90vw] text-center">
+        <span id="toastValidaFuturoTexto">Listo</span>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js";
+        import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAee29RNZa3A-C-8APC1x_yMzViMgR7bBA",
+            authDomain: "futuro-ahora.firebaseapp.com",
+            databaseURL: "https://futuro-ahora-default-rtdb.firebaseio.com",
+            projectId: "futuro-ahora",
+            storageBucket: "futuro-ahora.firebasestorage.app",
+            messagingSenderId: "727564715444",
+            appId: "1:727564715444:web:0c4d66d7c2260daaeddee1",
+            measurementId: "G-EDDTRWG6VV"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const LOGO_OFICIAL_VALIDAFUTURO = "https://i.postimg.cc/hj5Yd36w/1795216639379.jpg";
+        const STORAGE_TRABAJADORES = "validafuturo_trabajadores_v1";
+        const STORAGE_VALIDACIONES = "validafuturo_validaciones_v1";
+        const STORAGE_TEMA = "validafuturo_tema_neon_v1";
+        const STORAGE_MODO = "validafuturo_modo_tema_v1";
+
+        const TARJETAS_DEFAULT = {
+            bono_unico_laboral: {
+                titulo: "Bono Unico Laboral (Noviembre 2026)",
+                subtitulo: "Lista de trabajadores · Envíos al admin"
+            },
+            bonificacion_ubii: {
+                titulo: "Bonificacion UbiiApp",
+                subtitulo: "Lista de trabajadores · Envíos al admin"
+            },
+            bono_complementario_nomina: {
+                titulo: "Bono Complementario de Nomina",
+                subtitulo: "Lista de trabajadores · Envíos al admin"
+            },
+            consulta_cedula: {
+                titulo: "Consulta por cedula",
+                subtitulo: "Verifica nombres y apellidos por cédula"
+            },
+            registro_trabajador: {
+                titulo: "Registro de trabajador",
+                subtitulo: "Registra cédula, nombres y apellidos"
+            }
+        };
+
+        const TEMAS_FUTURO = {
+            "purpura": { label: "Púrpura Neón", primary: "#a855f7", secondary: "#3b82f6", ring: "rgba(168, 85, 247, 0.38)", glow: "0 0 20px rgba(168, 85, 247, 0.42), 0 0 10px rgba(59, 130, 246, 0.25)", onAction: "#ffffff", accent: "#c084fc" },
+            "azul":    { label: "Azul Neón",    primary: "#38bdf8", secondary: "#2563eb", ring: "rgba(56, 189, 248, 0.38)", glow: "0 0 20px rgba(56, 189, 248, 0.42), 0 0 10px rgba(37, 99, 235, 0.25)", onAction: "#051221", accent: "#7dd3fc" },
+            "verde":   { label: "Verde Neón",   primary: "#10b981", secondary: "#22c55e", ring: "rgba(16, 185, 129, 0.38)", glow: "0 0 20px rgba(16, 185, 129, 0.42), 0 0 10px rgba(34, 197, 94, 0.25)", onAction: "#042814", accent: "#6ee7b7" },
+            "rosado":  { label: "Rosado Neón",  primary: "#ec4899", secondary: "#a855f7", ring: "rgba(236, 72, 153, 0.38)", glow: "0 0 20px rgba(236, 72, 153, 0.42), 0 0 10px rgba(168, 85, 247, 0.25)", onAction: "#ffffff", accent: "#f472b6" },
+            "rojo":    { label: "Rojo Neón",    primary: "#f43f5e", secondary: "#ef4444", ring: "rgba(244, 63, 94, 0.38)", glow: "0 0 20px rgba(244, 63, 94, 0.42), 0 0 10px rgba(239, 68, 68, 0.25)", onAction: "#ffffff", accent: "#fb7185" },
+            "amarillo":{ label: "Amarillo Neón",primary: "#facc15", secondary: "#eab308", ring: "rgba(250, 204, 21, 0.40)", glow: "0 0 20px rgba(250, 204, 21, 0.42), 0 0 10px rgba(234, 179, 8, 0.25)", onAction: "#1c1503", accent: "#fde047" },
+            "celeste": { label: "Celeste Neón", primary: "#22d3ee", secondary: "#06b6d4", ring: "rgba(34, 211, 238, 0.38)", glow: "0 0 20px rgba(34, 211, 238, 0.42), 0 0 10px rgba(6, 182, 212, 0.25)", onAction: "#042229", accent: "#67e8f9" }
+        };
+
+        const state = {
+            faseInicio: "animando",
+            vista: "inicio",
+            tipoBonoActivo: "bono_unico_laboral",
+            filtroEstadoBono: "todos",
+            mostrarBuscadorLista: false,
+            mostrarPanelAccion: false,
+            mostrarSelectorTema: false,
+            escanerQrActivo: false,
+            menuFilaAbiertaCedula: "",
+            ocultosEnLista: {},
+            temaId: cargarTemaLocal(),
+            modoOscuro: cargarModoLocal(),
+            tarjetasConfig: { ...TARJETAS_DEFAULT },
+            cedulaValidacion: "",
+            trabajadorEncontrado: null,
+            errorValidacion: "",
+            pendienteAdmin: null,
+            cedulaConsulta: "",
+            resultadoConsulta: null,
+            noEncontradoConsulta: false,
+            cedulaRegistro: "",
+            nombresRegistro: "",
+            apellidosRegistro: "",
+            filtroCedulas: "",
+            trabajadores: cargarTrabajadoresLocal(),
+            validaciones: cargarValidacionesLocal(),
+            enviosPendientesAdmin: {}
+        };
+
+        let toastTimer = null;
+        let qrStream = null;
+        let qrRafId = null;
+        let qrCanvas = null;
+
+        function iniciarSecuenciaBienvenida() {
+            state.faseInicio = "animando";
+            setTimeout(() => {
+                state.faseInicio = "bienvenido";
+                render();
+                setTimeout(() => {
+                    state.faseInicio = "listo";
+                    render();
+                }, 1100);
+            }, 4000);
+        }
+
+        function cargarModoLocal() {
+            try {
+                const m = localStorage.getItem(STORAGE_MODO);
+                return m === "light" ? false : true;
+            } catch (e) {
+                return true;
+            }
+        }
+
+        function aplicarModo(esOscuro) {
+            const html = document.documentElement;
+            if (esOscuro) {
+                html.classList.add("dark");
+            } else {
+                html.classList.remove("dark");
+            }
+        }
+
+        function cargarTemaLocal() {
+            try {
+                const t = localStorage.getItem(STORAGE_TEMA);
+                return t && TEMAS_FUTURO[t] ? t : "purpura";
+            } catch (e) {
+                return "purpura";
+            }
+        }
+
+        function aplicarTema(id) {
+            const t = TEMAS_FUTURO[id] || TEMAS_FUTURO.purpura;
+            const root = document.documentElement;
+            root.style.setProperty("--theme-primary", t.primary);
+            root.style.setProperty("--theme-secondary", t.secondary);
+            root.style.setProperty("--theme-ring", t.ring);
+            root.style.setProperty("--theme-glow", t.glow);
+            root.style.setProperty("--theme-on-action", t.onAction);
+            root.style.setProperty("--theme-accent-text", t.accent);
+        }
+
+        function cargarTrabajadoresLocal() {
+            try {
+                const raw = localStorage.getItem(STORAGE_TRABAJADORES);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+                }
+            } catch (e) {}
+            return [
+                { cedula: "V30499612", nombres: "Cesar Eduardo", apellidos: "Vega Veliz", cargo: "Trabajador Futuro Ahora" },
+                { cedula: "V27333041", nombres: "Yonaikel Jose", apellidos: "Silva Zambrano", cargo: "Operaciones" },
+                { cedula: "V32730373", nombres: "Andres Eduardo", apellidos: "Dominguez Garcia", cargo: "Soporte" }
+            ];
+        }
+
+        function guardarTrabajadoresLocal() {
+            try {
+                localStorage.setItem(STORAGE_TRABAJADORES, JSON.stringify(state.trabajadores));
+            } catch (e) {}
+        }
+
+        function cargarValidacionesLocal() {
+            try {
+                const raw = localStorage.getItem(STORAGE_VALIDACIONES);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed)) return parsed;
+                }
+            } catch (e) {}
+            return [];
+        }
+
+        function guardarValidacionesLocal() {
+            try {
+                localStorage.setItem(STORAGE_VALIDACIONES, JSON.stringify(state.validaciones));
+            } catch (e) {}
+        }
+
+        function mostrarToast(msg) {
+            const el = document.getElementById("toastValidaFuturo");
+            const txt = document.getElementById("toastValidaFuturoTexto");
+            if (!el || !txt) return;
+            txt.textContent = msg;
+            el.classList.remove("hidden");
+            if (toastTimer) clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => el.classList.add("hidden"), 2500);
+        }
+
+        function normalizarCedula(raw) {
+            const limpia = String(raw || "").trim().toUpperCase().replace(/[^VEP0-9]/g, "");
+            if (!limpia) return "";
+            if (/^[0-9]+$/.test(limpia)) return "V" + limpia;
+            return limpia;
+        }
+
+        function claveContextoLista() {
+            return state.vista === "validarBono" ? `${state.vista}_${state.tipoBonoActivo}` : state.vista;
+        }
+
+        function cantidadOcultosEnContexto() {
+            return (state.ocultosEnLista[claveContextoLista()] || []).length;
+        }
+
+        function estaOcultoEnLista(cedulaRaw) {
+            const ced = normalizarCedula(cedulaRaw);
+            const listaOcultos = state.ocultosEnLista[claveContextoLista()] || [];
+            return listaOcultos.includes(ced);
+        }
+
+        function obtenerEstadoEnvioBono(cedulaRaw, tipoBonoKey = state.tipoBonoActivo) {
+            const ced = normalizarCedula(cedulaRaw);
+            if (!ced) return "sin_envio";
+
+            const regPend = state.enviosPendientesAdmin?.[tipoBonoKey]?.[ced];
+            if (regPend) {
+                if (regPend.estadoAdmin === "enviado_confirmado") return "enviado";
+                return "pendiente_admin";
+            }
+
+            const enValidaciones = state.validaciones.filter(
+                v => normalizarCedula(v.cedula) === ced && v.tipoBono === tipoBonoKey
+            );
+            if (enValidaciones.some(v => v.estadoAdmin === "enviado_confirmado")) {
+                return "enviado";
+            }
+            if (enValidaciones.length > 0) {
+                return "pendiente_admin";
+            }
+            return "sin_envio";
+        }
+
+        function bonoEnviadoATrabajador(cedulaRaw) {
+            return obtenerEstadoEnvioBono(cedulaRaw, state.tipoBonoActivo) === "enviado";
+        }
+
+        function extraerTrabajadorNormalizado(k, v) {
+            if (!v || typeof v !== "object") return null;
+            const ced = normalizarCedula(v.cedula || k);
+            const nombres = String(v.nombres ?? v.nombre ?? "").trim();
+            const apellidos = String(v.apellidos ?? v.apellido ?? "").trim();
+            if (!ced || (!nombres && !apellidos)) return null;
+            return {
+                cedula: ced,
+                nombres,
+                apellidos,
+                cargo: v.cargo || "Trabajador Futuro Ahora"
+            };
+        }
+
+        function fusionarTrabajadoresEnEstado(nuevosItems) {
+            if (!Array.isArray(nuevosItems) || nuevosItems.length === 0) return false;
+            const mapa = new Map();
+            state.trabajadores.forEach(t => {
+                const norm = extraerTrabajadorNormalizado(t.cedula, t);
+                if (norm) mapa.set(norm.cedula, norm);
+            });
+            nuevosItems.forEach(t => {
+                const norm = extraerTrabajadorNormalizado(t.cedula, t);
+                if (norm) mapa.set(norm.cedula, norm);
+            });
+            state.trabajadores = Array.from(mapa.values());
+            guardarTrabajadoresLocal();
+            return true;
+        }
+
+        function buscarTrabajadorPorCedula(cedulaRaw) {
+            const ced = normalizarCedula(cedulaRaw);
+            if (!ced) return null;
+            return state.trabajadores.find(t => normalizarCedula(t.cedula) === ced) || null;
+        }
+
+        function obtenerTituloBono(tipoKey) {
+            const tc = state.tarjetasConfig || TARJETAS_DEFAULT;
+            if (tipoKey === "bonificacion_ubii") {
+                return tc.bonificacion_ubii?.titulo || TARJETAS_DEFAULT.bonificacion_ubii.titulo;
+            }
+            if (tipoKey === "bono_complementario_nomina") {
+                return tc.bono_complementario_nomina?.titulo || TARJETAS_DEFAULT.bono_complementario_nomina.titulo;
+            }
+            return tc.bono_unico_laboral?.titulo || TARJETAS_DEFAULT.bono_unico_laboral.titulo;
+        }
+
+        function obtenerListaFiltradaCedulas() {
+            const q = String(state.filtroCedulas || "").trim().toLowerCase();
+            const esBono = state.vista === "validarBono";
+
+            return state.trabajadores.filter(t => {
+                const ced = normalizarCedula(t.cedula);
+                if (estaOcultoEnLista(ced)) return false;
+
+                if (esBono) {
+                    const enviado = bonoEnviadoATrabajador(ced);
+                    if (state.filtroEstadoBono === "enviados" && !enviado) return false;
+                    if (state.filtroEstadoBono === "pendientes" && enviado) return false;
+                }
+
+                const cedLower = ced.toLowerCase();
+                const full = `${t.nombres || ""} ${t.apellidos || ""}`.toLowerCase();
+                return !q || cedLower.includes(q) || full.includes(q);
+            });
+        }
+
+        function detenerEscanerQR() {
+            state.escanerQrActivo = false;
+            if (qrRafId) {
+                cancelAnimationFrame(qrRafId);
+                qrRafId = null;
+            }
+            if (qrStream) {
+                qrStream.getTracks().forEach(track => track.stop());
+                qrStream = null;
+            }
+        }
+
+        function procesarTextoQRDetectado(rawText) {
+            const texto = String(rawText || "").trim();
+            if (!texto) return;
+            const partes = texto.split("|");
+            const ced = normalizarCedula(partes[0] || texto);
+            if (!ced) {
+                mostrarToast("QR leído sin cédula válida");
+                return;
+            }
+
+            detenerEscanerQR();
+            mostrarToast("QR detectado: " + ced);
+
+            if (state.vista === "consulta") {
+                state.cedulaConsulta = ced;
+                window.ejecutarConsultaCedula(null);
+            } else {
+                state.tipoBonoActivo = state.tipoBonoActivo || "bono_unico_laboral";
+                state.vista = "validarBono";
+                state.cedulaValidacion = ced;
+                window.buscarTrabajadorParaBono(null);
+            }
+        }
+
+        function bucleLecturaQR() {
+            if (!state.escanerQrActivo) return;
+            const video = document.getElementById("videoEscanerQR");
+            if (video && video.readyState === video.HAVE_ENOUGH_DATA && typeof window.jsQR === "function") {
+                if (!qrCanvas) qrCanvas = document.createElement("canvas");
+                qrCanvas.width = video.videoWidth;
+                qrCanvas.height = video.videoHeight;
+                const ctx = qrCanvas.getContext("2d", { willReadFrequently: true });
+                if (ctx && qrCanvas.width > 0 && qrCanvas.height > 0) {
+                    ctx.drawImage(video, 0, 0, qrCanvas.width, qrCanvas.height);
+                    const imgData = ctx.getImageData(0, 0, qrCanvas.width, qrCanvas.height);
+                    const code = window.jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts: "attemptBoth" });
+                    if (code && code.data) {
+                        procesarTextoQRDetectado(code.data);
+                        return;
+                    }
+                }
+            }
+            qrRafId = requestAnimationFrame(bucleLecturaQR);
+        }
+
+        window.alternarModoClaroOscuro = function() {
+            state.modoOscuro = !state.modoOscuro;
+            try {
+                localStorage.setItem(STORAGE_MODO, state.modoOscuro ? "dark" : "light");
+            } catch (e) {}
+            aplicarModo(state.modoOscuro);
+            mostrarToast(state.modoOscuro ? "Modo oscuro activado" : "Modo claro activado");
+            render();
+        };
+
+        window.setFiltroEstadoBono = function(nuevoFiltro) {
+            state.filtroEstadoBono = nuevoFiltro;
+            state.menuFilaAbiertaCedula = "";
+            render();
+        };
+
+        window.alternarEscanerQR = async function() {
+            if (state.escanerQrActivo) {
+                detenerEscanerQR();
+                render();
+                return;
+            }
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                mostrarToast("Cámara no disponible en este navegador");
+                return;
+            }
+            try {
+                qrStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: { ideal: "environment" } },
+                    audio: false
+                });
+                state.escanerQrActivo = true;
+                state.mostrarPanelAccion = true;
+                render();
+                setTimeout(() => {
+                    const video = document.getElementById("videoEscanerQR");
+                    if (video && qrStream) {
+                        video.srcObject = qrStream;
+                        video.setAttribute("playsinline", "true");
+                        video.play().catch(() => {});
+                        qrRafId = requestAnimationFrame(bucleLecturaQR);
+                    }
+                }, 60);
+            } catch (err) {
+                detenerEscanerQR();
+                mostrarToast("Permiso de cámara denegado o no disponible");
+                render();
+            }
+        };
+
+        window.restaurarOcultosEnLista = function() {
+            const ctx = claveContextoLista();
+            state.ocultosEnLista[ctx] = [];
+            mostrarToast("Trabajadores ocultos restaurados en la lista");
+            render();
+        };
+
+        window.seleccionarTemaFuturo = function(id) {
+            if (!TEMAS_FUTURO[id]) return;
+            state.temaId = id;
+            try { localStorage.setItem(STORAGE_TEMA, id); } catch (e) {}
+            aplicarTema(id);
+            state.mostrarSelectorTema = false;
+            mostrarToast("Tema: " + TEMAS_FUTURO[id].label);
+            render();
+        };
+
+        window.toggleSelectorTema = function() {
+            state.mostrarSelectorTema = !state.mostrarSelectorTema;
+            render();
+        };
+
+        window.toggleBuscadorLista = function() {
+            state.mostrarBuscadorLista = !state.mostrarBuscadorLista;
+            state.menuFilaAbiertaCedula = "";
+            if (!state.mostrarBuscadorLista) state.filtroCedulas = "";
+            render();
+            if (state.mostrarBuscadorLista) {
+                setTimeout(() => document.getElementById("inputFiltroCedulas")?.focus(), 40);
+            }
+        };
+
+        window.onCambioFiltroCedulas = function(val) {
+            state.filtroCedulas = val;
+            render();
+            const inp = document.getElementById("inputFiltroCedulas");
+            if (inp) {
+                inp.focus();
+                const pos = val.length;
+                inp.setSelectionRange(pos, pos);
+            }
+        };
+
+        window.alternarMenuFila = function(ev, cedulaRaw) {
+            if (ev && typeof ev.stopPropagation === "function") ev.stopPropagation();
+            const ced = normalizarCedula(cedulaRaw);
+            state.menuFilaAbiertaCedula = state.menuFilaAbiertaCedula === ced ? "" : ced;
+            render();
+        };
+
+        window.eliminarDelRegistro = function(ev, cedulaRaw) {
+            if (ev && typeof ev.stopPropagation === "function") ev.stopPropagation();
+            const ced = normalizarCedula(cedulaRaw);
+            if (!ced) return;
+
+            const ctx = claveContextoLista();
+            const actual = state.ocultosEnLista[ctx] || [];
+            if (!actual.includes(ced)) {
+                state.ocultosEnLista[ctx] = [...actual, ced];
+            }
+            state.menuFilaAbiertaCedula = "";
+            mostrarToast(`Quitado de la lista (${ced}). El trabajador sigue en el sistema.`);
+            render();
+        };
+
+        window.seleccionarCedulaDesdeLista = function(cedulaRaw) {
+            const ced = normalizarCedula(cedulaRaw);
+            if (!ced) return;
+            state.menuFilaAbiertaCedula = "";
+            state.mostrarPanelAccion = true;
+            if (state.vista === "validarBono") {
+                state.cedulaValidacion = ced;
+                window.buscarTrabajadorParaBono(null);
+            } else if (state.vista === "consulta") {
+                state.cedulaConsulta = ced;
+                window.ejecutarConsultaCedula(null);
+            } else if (state.vista === "registro") {
+                state.cedulaRegistro = ced;
+                render();
+            }
+        };
+
+        window.irVista = function(nuevaVista, tipoBono = null) {
+            detenerEscanerQR();
+            state.vista = nuevaVista;
+            state.filtroEstadoBono = "todos";
+            state.mostrarSelectorTema = false;
+            state.mostrarBuscadorLista = false;
+            state.mostrarPanelAccion = false;
+            state.menuFilaAbiertaCedula = "";
+            state.filtroCedulas = "";
+            if (tipoBono) {
+                state.tipoBonoActivo = tipoBono;
+                state.cedulaValidacion = "";
+                state.trabajadorEncontrado = null;
+                state.errorValidacion = "";
+            }
+            if (nuevaVista === "consulta") {
+                state.cedulaConsulta = "";
+                state.resultadoConsulta = null;
+                state.noEncontradoConsulta = false;
+            }
+            if (nuevaVista === "registro") {
+                state.cedulaRegistro = "";
+                state.nombresRegistro = "";
+                state.apellidosRegistro = "";
+            }
+            render();
+        };
+
+        window.abrirPanelAccion = function() {
+            state.mostrarPanelAccion = !state.mostrarPanelAccion;
+            state.menuFilaAbiertaCedula = "";
+            if (!state.mostrarPanelAccion) detenerEscanerQR();
+            render();
+            if (state.mostrarPanelAccion) {
+                setTimeout(() => {
+                    document.getElementById("inputCedulaBono")?.focus();
+                    document.getElementById("inputCedulaConsulta")?.focus();
+                    document.getElementById("inputCedulaRegistro")?.focus();
+                }, 40);
+            }
+        };
+
+        window.buscarTrabajadorParaBono = function(e) {
+            if (e && typeof e.preventDefault === "function") e.preventDefault();
+            const inp = document.getElementById("inputCedulaBono");
+            const ced = normalizarCedula(inp ? inp.value : state.cedulaValidacion);
+            state.cedulaValidacion = ced;
+            state.mostrarPanelAccion = true;
+
+            if (!ced || ced.length < 6) {
+                state.trabajadorEncontrado = null;
+                state.errorValidacion = "Ingresa un número de cédula válido.";
+                render();
+                return;
+            }
+
+            const encontrado = buscarTrabajadorPorCedula(ced);
+            if (!encontrado) {
+                state.trabajadorEncontrado = null;
+                state.errorValidacion = `La cédula ${ced} no está registrada como trabajador de Futuro Ahora.`;
+                render();
+                return;
+            }
+
+            state.errorValidacion = "";
+            state.trabajadorEncontrado = encontrado;
+            render();
+        };
+
+        window.solicitarConfirmacionBono = function() {
+            const t = state.trabajadorEncontrado;
+            if (!t) return;
+            const ced = normalizarCedula(t.cedula);
+            const bonoNombre = obtenerTituloBono(state.tipoBonoActivo);
+            const nombreCompleto = `${t.nombres} ${t.apellidos}`.trim();
+
+            state.pendienteAdmin = {
+                tipoBono: state.tipoBonoActivo,
+                bonoNombre,
+                cedula: ced,
+                nombreCompleto
+            };
+
+            const txt = document.getElementById("textoConfirmarBono");
+            const modal = document.getElementById("modalConfirmarBono");
+            if (txt) {
+                txt.innerHTML = `¿Deseas enviar los datos de <strong>${nombreCompleto}</strong> (<strong>${ced}</strong>) para <strong>${bonoNombre}</strong> al administrador de Futuro Ahora?`;
+            }
+            if (modal) {
+                modal.classList.remove("hidden");
+                modal.classList.add("flex");
+            }
+        };
+
+        window.cerrarModalConfirmarBono = function() {
+            state.pendienteAdmin = null;
+            const modal = document.getElementById("modalConfirmarBono");
+            if (modal) {
+                modal.classList.add("hidden");
+                modal.classList.remove("flex");
+            }
+        };
+
+        window.confirmarYCargarAlAdmin = async function() {
+            const p = state.pendienteAdmin;
+            if (!p) return;
+
+            const ahoraIso = new Date().toISOString();
+            const horaCorta = new Date().toLocaleTimeString("es-VE", { hour: "2-digit", minute: "2-digit" });
+            const registroPayload = {
+                tipoBono: p.tipoBono,
+                bono: p.bonoNombre,
+                cedula: p.cedula,
+                nombreCompleto: p.nombreCompleto,
+                estadoAdmin: "pendiente_foto_y_envio",
+                origen: "ValidaFuturo",
+                hora: horaCorta,
+                creadoEn: ahoraIso
+            };
+
+            state.validaciones.unshift({ id: "val_" + Date.now(), ...registroPayload });
+            guardarValidacionesLocal();
+
+            try {
+                await Promise.all([
+                    push(ref(db, "validacionesBonos"), registroPayload),
+                    set(ref(db, `enviosPendientesAdmin/${p.tipoBono}/${p.cedula}`), registroPayload)
+                ]);
+                mostrarToast(`Enviado al administrador: ${p.nombreCompleto}`);
+            } catch (err) {
+                mostrarToast(`Guardado local: ${p.nombreCompleto}`);
+            }
+
+            window.cerrarModalConfirmarBono();
+            state.cedulaValidacion = "";
+            state.trabajadorEncontrado = null;
+            state.mostrarPanelAccion = false;
+            render();
+        };
+
+        window.ejecutarConsultaCedula = function(e) {
+            if (e && typeof e.preventDefault === "function") e.preventDefault();
+            const inp = document.getElementById("inputCedulaConsulta");
+            const ced = normalizarCedula(inp ? inp.value : state.cedulaConsulta);
+            state.cedulaConsulta = ced;
+            state.mostrarPanelAccion = true;
+
+            if (!ced || ced.length < 6) {
+                state.resultadoConsulta = null;
+                state.noEncontradoConsulta = true;
+                render();
+                return;
+            }
+
+            const encontrado = buscarTrabajadorPorCedula(ced);
+            state.resultadoConsulta = encontrado || null;
+            state.noEncontradoConsulta = !encontrado;
+            render();
+        };
+
+        window.onCambioCedulaRegistro = function(val) {
+            state.cedulaRegistro = normalizarCedula(val);
+            const inp = document.getElementById("inputCedulaRegistro");
+            if (inp && inp.value !== state.cedulaRegistro) {
+                inp.value = state.cedulaRegistro;
+            }
+            const bloque = document.getElementById("bloqueNombresApellidos");
+            if (bloque) {
+                bloque.classList.toggle("hidden", state.cedulaRegistro.length < 6);
+            }
+        };
+
+        window.guardarNuevoTrabajador = async function(e) {
+            if (e && typeof e.preventDefault === "function") e.preventDefault();
+            const ced = normalizarCedula(document.getElementById("inputCedulaRegistro")?.value || state.cedulaRegistro);
+            const nombres = (document.getElementById("inputNombresRegistro")?.value || "").trim();
+            const apellidos = (document.getElementById("inputApellidosRegistro")?.value || "").trim();
+
+            if (!ced || ced.length < 6 || !nombres || !apellidos) {
+                mostrarToast("Completa cédula, nombres y apellidos");
+                return;
+            }
+
+            const nuevoTrabajador = {
+                cedula: ced,
+                nombres,
+                apellidos,
+                cargo: "Trabajador Futuro Ahora",
+                actualizadoEn: new Date().toISOString()
+            };
+
+            fusionarTrabajadoresEnEstado([nuevoTrabajador]);
+
+            try {
+                await Promise.all([
+                    set(ref(db, `trabajadoresFuturoAhora/${ced}`), nuevoTrabajador),
+                    set(ref(db, `workers/${ced}/cedula`), ced),
+                    set(ref(db, `workers/${ced}/nombre`), nombres),
+                    set(ref(db, `workers/${ced}/apellido`), apellidos)
+                ]);
+                mostrarToast(`Registrado: ${nombres} ${apellidos}`);
+            } catch (err) {
+                mostrarToast(`Guardado local: ${nombres} ${apellidos}`);
+            }
+
+            state.cedulaRegistro = "";
+            state.nombresRegistro = "";
+            state.apellidosRegistro = "";
+            state.mostrarPanelAccion = false;
+            render();
+        };
+
+        function renderSplashBienvenida() {
+            const esBienvenido = state.faseInicio === "bienvenido";
+
+            return `
+                <div class="flex-1 flex flex-col items-center justify-center p-6 text-center relative">
+                    <div class="glass-panel rounded-3xl p-7 w-full max-w-xs flex flex-col items-center space-y-4">
+                        <img src="${LOGO_OFICIAL_VALIDAFUTURO}" alt="Logo ValidaFuturo" class="w-20 h-20 rounded-2xl object-cover border border-purple-400/40 anim-logo-pulse">
+
+                        ${esBienvenido ? `
+                            <div class="space-y-1 anim-bienvenido">
+                                <div class="text-2xl font-black neon-text tracking-tight">Bienvenido</div>
+                                <div class="text-xs text-slate-600 dark:text-slate-300 font-semibold">ValidaFuturo · Futuro Ahora</div>
+                            </div>
+                        ` : `
+                            <div class="space-y-1">
+                                <div class="text-xl font-black text-slate-900 dark:text-white tracking-tight">ValidaFuturo</div>
+                                <div class="text-[11px] font-mono text-slate-500 dark:text-slate-400">Iniciando sistema...</div>
+                            </div>
+                            <div class="w-full h-2 rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden">
+                                <div class="h-full rounded-full grad-action anim-barra-4s"></div>
+                            </div>
+                        `}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderHeader() {
+            const esInicio = state.vista === "inicio";
+            const temaActual = TEMAS_FUTURO[state.temaId] || TEMAS_FUTURO.purpura;
+
+            return `
+                <header class="glass-panel border-b px-3.5 py-3 flex items-center justify-between gap-2 shrink-0 z-30 relative">
+                    ${esInicio
+                        ? `<button type="button" onclick="window.toggleSelectorTema()" class="px-2.5 py-1.5 rounded-xl field-box text-[10px] font-extrabold flex items-center gap-1.5 cursor-pointer" title="Temas ValidaFuturo">
+                               <span class="w-2.5 h-2.5 rounded-full" style="background:${temaActual.primary}"></span>
+                               <span>Temas</span>
+                           </button>`
+                        : `<button type="button" onclick="window.irVista('inicio')" class="w-8 h-8 rounded-xl field-box flex items-center justify-center text-slate-700 dark:text-slate-200 cursor-pointer" title="Volver">
+                               <i class="fa-solid fa-arrow-left text-sm"></i>
+                           </button>`
+                    }
+
+                    <div class="flex items-center gap-2 font-black text-base tracking-tight text-slate-900 dark:text-white">
+                        <img src="${LOGO_OFICIAL_VALIDAFUTURO}" alt="Logo ValidaFuturo" class="w-7 h-7 rounded-lg object-cover border border-purple-400/40 shrink-0">
+                        <span>ValidaFuturo</span>
+                    </div>
+
+                    <div class="flex items-center gap-1.5">
+                        <button type="button" onclick="window.alternarModoClaroOscuro()" class="w-8 h-8 rounded-xl field-box flex items-center justify-center text-slate-700 dark:text-slate-200 cursor-pointer" title="${state.modoOscuro ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}">
+                            <i class="fa-solid ${state.modoOscuro ? "fa-sun text-amber-300" : "fa-moon text-indigo-600"} text-xs"></i>
+                        </button>
+                        ${esInicio
+                            ? `<span class="text-[10px] font-mono font-bold neon-text bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 px-2 py-1 rounded-xl">
+                                   ${state.validaciones.length}
+                               </span>`
+                            : `<button type="button" onclick="window.toggleBuscadorLista()" class="w-8 h-8 rounded-xl field-box flex items-center justify-center text-slate-700 dark:text-slate-200 cursor-pointer" title="Buscar">
+                                   <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                               </button>`
+                        }
+                    </div>
+
+                    ${state.mostrarSelectorTema ? `
+                        <div class="absolute left-3.5 top-14 w-56 glass-panel rounded-2xl p-2.5 space-y-1 z-50 border shadow-2xl">
+                            <div class="text-[10px] font-mono uppercase font-bold neon-text px-2 py-1">Temas ValidaFuturo</div>
+                            ${Object.entries(TEMAS_FUTURO).map(([id, t]) => `
+                                <button type="button" onclick="window.seleccionarTemaFuturo('${id}')" class="w-full px-3 py-2 rounded-xl text-left text-xs font-bold flex items-center justify-between cursor-pointer ${state.temaId === id ? "grad-action" : "hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200"}">
+                                    <span class="flex items-center gap-2">
+                                        <span class="w-3 h-3 rounded-full" style="background:${t.primary}"></span>
+                                        <span>${t.label}</span>
+                                    </span>
+                                    ${state.temaId === id ? '<i class="fa-solid fa-check text-[10px]"></i>' : ""}
+                                </button>
+                            `).join("")}
+                        </div>
+                    ` : ""}
+                </header>
+            `;
+        }
+
+        function renderInicio() {
+            const totalLaboral = state.validaciones.filter(v => v.tipoBono === "bono_unico_laboral").length;
+            const totalUbii = state.validaciones.filter(v => v.tipoBono === "bonificacion_ubii").length;
+            const totalComplementario = state.validaciones.filter(v => v.tipoBono === "bono_complementario_nomina").length;
+            const tc = state.tarjetasConfig || TARJETAS_DEFAULT;
+
+            return `
+                <div class="flex-1 overflow-y-auto p-4 pb-6 space-y-2.5">
+                    <button type="button" onclick="window.irVista('validarBono', 'bono_unico_laboral')" class="module-card w-full text-left bg-gradient-to-r from-purple-700 via-indigo-700 to-blue-700 cursor-pointer">
+                        <i class="fa-solid fa-sack-dollar text-6xl opacity-15 absolute right-3 bottom-2"></i>
+                        <div class="text-base font-extrabold">${tc.bono_unico_laboral.titulo}</div>
+                        <div class="text-xs text-purple-100/90 mt-0.5">${tc.bono_unico_laboral.subtitulo} · ${totalLaboral} enviados</div>
+                    </button>
+
+                    <button type="button" onclick="window.irVista('validarBono', 'bonificacion_ubii')" class="module-card w-full text-left bg-gradient-to-r from-blue-700 via-cyan-700 to-purple-700 cursor-pointer">
+                        <i class="fa-solid fa-wallet text-6xl opacity-15 absolute right-3 bottom-2"></i>
+                        <div class="text-base font-extrabold">${tc.bonificacion_ubii.titulo}</div>
+                        <div class="text-xs text-cyan-100/90 mt-0.5">${tc.bonificacion_ubii.subtitulo} · ${totalUbii} enviados</div>
+                    </button>
+
+                    <button type="button" onclick="window.irVista('validarBono', 'bono_complementario_nomina')" class="module-card w-full text-left bg-gradient-to-r from-cyan-700 via-indigo-700 to-purple-700 cursor-pointer">
+                        <i class="fa-solid fa-file-invoice-dollar text-6xl opacity-15 absolute right-3 bottom-2"></i>
+                        <div class="text-base font-extrabold">${tc.bono_complementario_nomina.titulo}</div>
+                        <div class="text-xs text-cyan-100/90 mt-0.5">${tc.bono_complementario_nomina.subtitulo} · ${totalComplementario} enviados</div>
+                    </button>
+
+                    <button type="button" onclick="window.irVista('consulta')" class="module-card w-full text-left bg-gradient-to-r from-indigo-700 via-purple-700 to-fuchsia-700 cursor-pointer">
+                        <i class="fa-solid fa-id-card text-6xl opacity-15 absolute right-3 bottom-2"></i>
+                        <div class="text-base font-extrabold">${tc.consulta_cedula.titulo}</div>
+                        <div class="text-xs text-indigo-100/90 mt-0.5">${tc.consulta_cedula.subtitulo}</div>
+                    </button>
+
+                    <button type="button" onclick="window.irVista('registro')" class="module-card w-full text-left bg-gradient-to-r from-violet-700 via-blue-700 to-indigo-800 cursor-pointer">
+                        <i class="fa-solid fa-user-plus text-6xl opacity-15 absolute right-3 bottom-2"></i>
+                        <div class="text-base font-extrabold">${tc.registro_trabajador.titulo}</div>
+                        <div class="text-xs text-violet-100/90 mt-0.5">${tc.registro_trabajador.subtitulo}</div>
+                    </button>
+                </div>
+            `;
+        }
+
+        function renderVistaListaInterna() {
+            const esBono = state.vista === "validarBono";
+            const esConsulta = state.vista === "consulta";
+            const esRegistro = state.vista === "registro";
+            const tc = state.tarjetasConfig || TARJETAS_DEFAULT;
+
+            const titulo = esBono
+                ? obtenerTituloBono(state.tipoBonoActivo)
+                : (esConsulta ? tc.consulta_cedula.titulo : tc.registro_trabajador.titulo);
+
+            const subtitulo = esBono
+                ? "Registros"
+                : (esConsulta ? "Trabajadores" : "Alta de personal");
+
+            const baseSinOcultar = state.trabajadores.filter(t => !estaOcultoEnLista(t.cedula));
+            const totalPendientesBono = esBono ? baseSinOcultar.filter(t => !bonoEnviadoATrabajador(t.cedula)).length : 0;
+            const totalEnviadosBono = esBono ? baseSinOcultar.filter(t => bonoEnviadoATrabajador(t.cedula)).length : 0;
+
+            const listaFiltrada = obtenerListaFiltradaCedulas();
+            const ocultosCount = cantidadOcultosEnContexto();
+            const contadorTexto = esBono
+                ? `${totalEnviadosBono}/${baseSinOcultar.length}`
+                : `${listaFiltrada.length}`;
+
+            return `
+                <div class="flex-1 overflow-y-auto pb-24 relative">
+                    <div class="px-4 pt-3.5 pb-2.5 space-y-2">
+                        <h1 class="text-xl font-black neon-text leading-snug">${titulo}</h1>
+                        <div class="flex items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
+                            <span>${subtitulo}</span>
+                            <div class="flex items-center gap-2">
+                                ${ocultosCount > 0 ? `
+                                    <button type="button" onclick="window.restaurarOcultosEnLista()" class="px-2 py-0.5 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 dark:bg-white/10 dark:hover:bg-white/15 text-[10px] font-extrabold dark:text-slate-200 cursor-pointer transition">
+                                        Restaurar ocultos (${ocultosCount})
+                                    </button>
+                                ` : ""}
+                                <span class="font-mono font-extrabold neon-text">
+                                    <i class="fa-solid fa-user mr-1 text-[11px]"></i>${contadorTexto}
+                                </span>
+                            </div>
+                        </div>
+
+                        ${esBono ? `
+                            <div class="grid grid-cols-3 gap-1.5 pt-1">
+                                <button type="button" onclick="window.setFiltroEstadoBono('todos')" class="py-1.5 px-2 rounded-xl text-[10px] font-extrabold cursor-pointer transition ${state.filtroEstadoBono === "todos" ? "grad-action" : "field-box text-slate-700 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-white/5"}">
+                                    Todos (${baseSinOcultar.length})
+                                </button>
+                                <button type="button" onclick="window.setFiltroEstadoBono('pendientes')" class="py-1.5 px-2 rounded-xl text-[10px] font-extrabold cursor-pointer transition ${state.filtroEstadoBono === "pendientes" ? "grad-action" : "field-box text-slate-700 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-white/5"}">
+                                    Pendientes ✓ (${totalPendientesBono})
+                                </button>
+                                <button type="button" onclick="window.setFiltroEstadoBono('enviados')" class="py-1.5 px-2 rounded-xl text-[10px] font-extrabold cursor-pointer transition ${state.filtroEstadoBono === "enviados" ? "grad-action" : "field-box text-slate-700 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-white/5"}">
+                                    Enviados ✓✓ (${totalEnviadosBono})
+                                </button>
+                            </div>
+                        ` : ""}
+                    </div>
+
+                    ${state.mostrarBuscadorLista ? `
+                        <div class="px-4 pb-2.5">
+                            <input type="text" id="inputFiltroCedulas" value="${state.filtroCedulas}" oninput="window.onCambioFiltroCedulas(this.value)" placeholder="Buscar por nombre o cédula..." class="w-full field-box rounded-xl px-3.5 py-2 text-xs">
+                        </div>
+                    ` : ""}
+
+                    ${state.mostrarPanelAccion ? `
+                        <div class="px-4 pb-3 space-y-2.5">
+                            ${esBono ? `
+                                <form onsubmit="window.buscarTrabajadorParaBono(event)" class="glass-panel rounded-2xl p-3.5 space-y-2.5">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <label for="inputCedulaBono" class="text-[11px] font-extrabold neon-text uppercase">Cédula del trabajador</label>
+                                        <button type="button" onclick="window.alternarEscanerQR()" class="px-2.5 py-1 rounded-lg field-box text-[10px] font-extrabold neon-text flex items-center gap-1 cursor-pointer">
+                                            <i class="fa-solid ${state.escanerQrActivo ? "fa-video-slash" : "fa-qrcode"}"></i>
+                                            <span>${state.escanerQrActivo ? "Cerrar QR" : "Escanear QR"}</span>
+                                        </button>
+                                    </div>
+
+                                    ${state.escanerQrActivo ? `
+                                        <div class="rounded-xl overflow-hidden bg-black border border-slate-300 dark:border-white/15 relative h-44 flex items-center justify-center">
+                                            <video id="videoEscanerQR" class="w-full h-full object-cover"></video>
+                                            <span class="absolute bottom-2 px-2.5 py-0.5 rounded-full bg-black/75 text-[10px] font-mono text-slate-200">Apunta al código QR...</span>
+                                        </div>
+                                    ` : ""}
+
+                                    <div class="flex gap-2">
+                                        <input type="text" id="inputCedulaBono" value="${state.cedulaValidacion}" required placeholder="Ej. V30499612" class="flex-1 field-box rounded-xl px-3 py-2 text-xs font-mono font-bold">
+                                        <button type="submit" class="px-3.5 py-2 rounded-xl grad-action text-xs font-extrabold cursor-pointer shrink-0">Buscar</button>
+                                    </div>
+                                    ${state.errorValidacion ? `<div class="text-[11px] font-bold text-rose-500 dark:text-rose-400">${state.errorValidacion}</div>` : ""}
+                                    ${state.trabajadorEncontrado ? `
+                                        <div class="bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl p-3 space-y-2">
+                                            <div class="text-xs font-black text-slate-900 dark:text-white">${state.trabajadorEncontrado.nombres} ${state.trabajadorEncontrado.apellidos}</div>
+                                            <div class="text-[11px] font-mono neon-text">${normalizarCedula(state.trabajadorEncontrado.cedula)}</div>
+                                            <button type="button" onclick="window.solicitarConfirmacionBono()" class="w-full py-2.5 rounded-xl grad-action text-xs font-extrabold cursor-pointer">
+                                                Confirmar y cargar al admin
+                                            </button>
+                                        </div>
+                                    ` : ""}
+                                </form>
+                            ` : ""}
+
+                            ${esConsulta ? `
+                                <form onsubmit="window.ejecutarConsultaCedula(event)" class="glass-panel rounded-2xl p-3.5 space-y-2.5">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <label for="inputCedulaConsulta" class="text-[11px] font-extrabold neon-text uppercase">Consultar cédula</label>
+                                        <button type="button" onclick="window.alternarEscanerQR()" class="px-2.5 py-1 rounded-lg field-box text-[10px] font-extrabold neon-text flex items-center gap-1 cursor-pointer">
+                                            <i class="fa-solid ${state.escanerQrActivo ? "fa-video-slash" : "fa-qrcode"}"></i>
+                                            <span>${state.escanerQrActivo ? "Cerrar QR" : "Escanear QR"}</span>
+                                        </button>
+                                    </div>
+
+                                    ${state.escanerQrActivo ? `
+                                        <div class="rounded-xl overflow-hidden bg-black border border-slate-300 dark:border-white/15 relative h-44 flex items-center justify-center">
+                                            <video id="videoEscanerQR" class="w-full h-full object-cover"></video>
+                                            <span class="absolute bottom-2 px-2.5 py-0.5 rounded-full bg-black/75 text-[10px] font-mono text-slate-200">Apunta al código QR...</span>
+                                        </div>
+                                    ` : ""}
+
+                                    <div class="flex gap-2">
+                                        <input type="text" id="inputCedulaConsulta" value="${state.cedulaConsulta}" required placeholder="Ej. V30499612" class="flex-1 field-box rounded-xl px-3 py-2 text-xs font-mono font-bold">
+                                        <button type="submit" class="px-3.5 py-2 rounded-xl grad-action text-xs font-extrabold cursor-pointer shrink-0">Consultar</button>
+                                    </div>
+                                    ${state.resultadoConsulta ? `
+                                        <div class="bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl p-3">
+                                            <div class="text-xs font-black text-slate-900 dark:text-white">${state.resultadoConsulta.nombres} ${state.resultadoConsulta.apellidos}</div>
+                                            <div class="text-[11px] font-mono neon-text">${normalizarCedula(state.resultadoConsulta.cedula)}</div>
+                                        </div>
+                                    ` : ""}
+                                    ${state.noEncontradoConsulta ? `<div class="text-[11px] font-bold text-amber-700 dark:text-amber-300">No se encontró la cédula ${state.cedulaConsulta}.</div>` : ""}
+                                </form>
+                            ` : ""}
+
+                            ${esRegistro ? `
+                                <form onsubmit="window.guardarNuevoTrabajador(event)" class="glass-panel rounded-2xl p-3.5 space-y-2.5">
+                                    <label for="inputCedulaRegistro" class="block text-[11px] font-extrabold neon-text uppercase">1. Cédula</label>
+                                    <input type="text" id="inputCedulaRegistro" value="${state.cedulaRegistro}" oninput="window.onCambioCedulaRegistro(this.value)" required placeholder="Ej. V30499612" class="w-full field-box rounded-xl px-3 py-2 text-xs font-mono font-bold">
+                                    <div id="bloqueNombresApellidos" class="${normalizarCedula(state.cedulaRegistro).length >= 6 ? "" : "hidden"} space-y-2 pt-1">
+                                        <input type="text" id="inputNombresRegistro" value="${state.nombresRegistro}" oninput="state.nombresRegistro = this.value;" placeholder="Nombres" class="w-full field-box rounded-xl px-3 py-2 text-xs font-bold">
+                                        <input type="text" id="inputApellidosRegistro" value="${state.apellidosRegistro}" oninput="state.apellidosRegistro = this.value;" placeholder="Apellidos" class="w-full field-box rounded-xl px-3 py-2 text-xs font-bold">
+                                        <button type="submit" class="w-full py-2.5 rounded-xl grad-action text-xs font-extrabold cursor-pointer">Guardar trabajador</button>
+                                    </div>
+                                </form>
+                            ` : ""}
+                        </div>
+                    ` : ""}
+
+                    <div class="glass-panel mx-3 rounded-2xl divide-y divide-slate-200 dark:divide-white/10 overflow-hidden">
+                        ${listaFiltrada.length === 0 ? `
+                            <div class="p-6 text-center text-xs text-slate-500 dark:text-slate-400">No hay trabajadores para mostrar en este filtro.</div>
+                        ` : listaFiltrada.map(t => {
+                            const ced = normalizarCedula(t.cedula);
+                            const nombreComp = `${t.nombres || ""} ${t.apellidos || ""}`.trim();
+                            const enviado = esBono && bonoEnviadoATrabajador(ced);
+                            const menuAbierto = state.menuFilaAbiertaCedula === ced;
+                            const iconoCheck = enviado
+                                ? '<i class="fa-solid fa-check-double text-xs text-emerald-500 dark:text-emerald-400" title="Bono enviado"></i>'
+                                : '<i class="fa-solid fa-check text-xs neon-text" title="Pendiente de envío"></i>';
+
+                            return `
+                                <div class="relative">
+                                    <div onclick="window.seleccionarCedulaDesdeLista('${ced}')" class="w-full px-4 py-3 text-left hover:bg-slate-100/80 dark:hover:bg-white/5 flex items-center justify-between gap-3 cursor-pointer transition">
+                                        <div class="min-w-0 flex-1">
+                                            <div class="text-sm font-bold neon-text truncate">${nombreComp}</div>
+                                            <div class="text-xs font-mono text-slate-500 dark:text-slate-400 mt-0.5">${ced}</div>
+                                        </div>
+                                        <div class="flex flex-col items-center gap-1.5 text-slate-500 dark:text-slate-400 shrink-0">
+                                            <button type="button" onclick="window.alternarMenuFila(event, '${ced}')" class="w-6 h-6 rounded-lg hover:bg-slate-200 dark:hover:bg-white/10 flex items-center justify-center text-slate-600 dark:text-slate-300 cursor-pointer" title="Opciones">
+                                                <i class="fa-solid fa-ellipsis-vertical text-xs"></i>
+                                            </button>
+                                            ${iconoCheck}
+                                        </div>
+                                    </div>
+
+                                    ${menuAbierto ? `
+                                        <div class="px-4 pb-2.5 flex justify-end">
+                                            <button type="button" onclick="window.eliminarDelRegistro(event, '${ced}')" class="px-3 py-1.5 rounded-xl bg-rose-600/15 hover:bg-rose-600/25 border border-rose-500/40 text-rose-700 dark:text-rose-300 text-[11px] font-extrabold flex items-center gap-1.5 cursor-pointer transition">
+                                                <i class="fa-solid fa-trash-can text-[10px]"></i>
+                                                <span>Eliminar del registro</span>
+                                            </button>
+                                        </div>
+                                    ` : ""}
+                                </div>
+                            `;
+                        }).join("")}
+                    </div>
+
+                    <button type="button" onclick="window.abrirPanelAccion()" class="fixed bottom-5 right-5 w-14 h-14 rounded-full grad-action flex items-center justify-center text-xl cursor-pointer z-20" title="Validar / Consultar / Registrar">
+                        <i class="fa-solid ${state.mostrarPanelAccion ? "fa-minus" : "fa-plus"}"></i>
+                    </button>
+                </div>
+            `;
+        }
+
+        function initFirebaseTrabajadores() {
+            onValue(ref(db, "trabajadoresFuturoAhora"), (snapshot) => {
+                if (!snapshot.exists()) return;
+                const raw = snapshot.val();
+                if (!raw || typeof raw !== "object") return;
+                const listaNube = Object.entries(raw)
+                    .map(([k, v]) => extraerTrabajadorNormalizado(k, v))
+                    .filter(Boolean);
+                if (fusionarTrabajadoresEnEstado(listaNube)) {
+                    render();
+                }
+            });
+
+            onValue(ref(db, "workers"), (snapshot) => {
+                if (!snapshot.exists()) return;
+                const raw = snapshot.val();
+                if (!raw || typeof raw !== "object") return;
+                const listaWorkers = Object.entries(raw)
+                    .map(([k, v]) => extraerTrabajadorNormalizado(k, v))
+                    .filter(Boolean);
+                if (fusionarTrabajadoresEnEstado(listaWorkers)) {
+                    render();
+                }
+            });
+
+            onValue(ref(db, "enviosPendientesAdmin"), (snapshot) => {
+                state.enviosPendientesAdmin = snapshot.exists() ? (snapshot.val() || {}) : {};
+                render();
+            });
+
+            onValue(ref(db, "config/futuroQrTarjetas"), (snapshot) => {
+                if (!snapshot.exists()) return;
+                const val = snapshot.val();
+                if (!val || typeof val !== "object") return;
+                state.tarjetasConfig = {
+                    bono_unico_laboral: { ...TARJETAS_DEFAULT.bono_unico_laboral, ...(val.bono_unico_laboral || {}) },
+                    bonificacion_ubii: { ...TARJETAS_DEFAULT.bonificacion_ubii, ...(val.bonificacion_ubii || {}) },
+                    bono_complementario_nomina: { ...TARJETAS_DEFAULT.bono_complementario_nomina, ...(val.bono_complementario_nomina || {}) },
+                    consulta_cedula: { ...TARJETAS_DEFAULT.consulta_cedula, ...(val.consulta_cedula || {}) },
+                    registro_trabajador: { ...TARJETAS_DEFAULT.registro_trabajador, ...(val.registro_trabajador || {}) }
+                };
+                render();
+            });
+        }
+
+        function render() {
+            const app = document.getElementById("app");
+            if (!app) return;
+
+            if (state.faseInicio !== "listo") {
+                app.innerHTML = renderSplashBienvenida();
+                return;
+            }
+
+            const contenido = state.vista === "inicio" ? renderInicio() : renderVistaListaInterna();
+            app.innerHTML = renderHeader() + contenido;
+
+            const btnNo = document.getElementById("btnCancelarConfirmar");
+            const btnSi = document.getElementById("btnAceptarConfirmar");
+            if (btnNo) btnNo.onclick = window.cerrarModalConfirmarBono;
+            if (btnSi) btnSi.onclick = window.confirmarYCargarAlAdmin;
+        }
+
+        aplicarModo(state.modoOscuro);
+        aplicarTema(state.temaId);
+        initFirebaseTrabajadores();
+        iniciarSecuenciaBienvenida();
+        render();
+    </script>
+</body>
+</html>
