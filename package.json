@@ -1,0 +1,15 @@
+{
+  "name": "validafuturo",
+  "version": "1.2.0",
+  "description": "Aplicación móvil y web ValidaFuturo para validación de bonos, consulta por cédula y registro de trabajadores en Futuro Ahora.",
+  "private": true,
+  "scripts": {
+    "prepare:web": "mkdir -p www && cp index.html www/index.html",
+    "cap:sync": "npm run prepare:web && npx cap sync android",
+    "cap:open": "npx cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/core": "^6.0.0"
+  }
+}
