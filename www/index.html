@@ -62,6 +62,8 @@
             flex-direction: column;
             position: relative;
             overflow: hidden;
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-bottom: env(safe-area-inset-bottom, 0px);
             background: radial-gradient(circle at 15% 0%, rgba(168, 85, 247, 0.16), transparent 42%),
                         radial-gradient(circle at 85% 12%, rgba(59, 130, 246, 0.16), transparent 45%),
                         #0b0e1c;
@@ -224,6 +226,7 @@
         const LOGO_OFICIAL_VALIDAFUTURO = "https://i.postimg.cc/hj5Yd36w/1795216639379.jpg";
         const STORAGE_TRABAJADORES = "validafuturo_trabajadores_v1";
         const STORAGE_VALIDACIONES = "validafuturo_validaciones_v1";
+        const STORAGE_OCULTOS = "validafuturo_ocultos_lista_v1";
         const STORAGE_TEMA = "validafuturo_tema_neon_v1";
         const STORAGE_MODO = "validafuturo_modo_tema_v1";
 
@@ -270,7 +273,7 @@
             mostrarSelectorTema: false,
             escanerQrActivo: false,
             menuFilaAbiertaCedula: "",
-            ocultosEnLista: {},
+            ocultosEnLista: cargarOcultosLocal(),
             temaId: cargarTemaLocal(),
             modoOscuro: cargarModoLocal(),
             tarjetasConfig: { ...TARJETAS_DEFAULT },
@@ -294,6 +297,75 @@
         let qrStream = null;
         let qrRafId = null;
         let qrCanvas = null;
+        let ignorarSiguientePopstate = false;
+
+        function inicializarHistorialNavegacion() {
+            try {
+                history.replaceState({ vista: "inicio" }, "", "#inicio");
+            } catch (e) {}
+
+            window.addEventListener("popstate", () => {
+                if (ignorarSiguientePopstate) {
+                    ignorarSiguientePopstate = false;
+                    return;
+                }
+
+                if (state.pendienteAdmin) {
+                    window.cerrarModalConfirmarBono();
+                    try { history.pushState({ vista: state.vista }, "", "#" + state.vista); } catch (e) {}
+                    return;
+                }
+
+                if (state.escanerQrActivo) {
+                    detenerEscanerQR();
+                    render();
+                    try { history.pushState({ vista: state.vista }, "", "#" + state.vista); } catch (e) {}
+                    return;
+                }
+
+                if (state.vista !== "inicio") {
+                    window.irVista("inicio", null, false);
+                } else {
+                    try { history.pushState({ vista: "inicio" }, "", "#inicio"); } catch (e) {}
+                }
+            });
+
+            document.addEventListener("backbutton", (ev) => {
+                ev.preventDefault();
+                ev.stopPropagation();
+
+                if (state.pendienteAdmin) {
+                    window.cerrarModalConfirmarBono();
+                    return;
+                }
+                if (state.escanerQrActivo) {
+                    detenerEscanerQR();
+                    render();
+                    return;
+                }
+                if (state.mostrarPanelAccion) {
+                    state.mostrarPanelAccion = false;
+                    render();
+                    return;
+                }
+                if (state.vista !== "inicio") {
+                    window.irVista("inicio", null, false);
+                }
+            }, false);
+        }
+
+        function registrarEstadoHistorial(nuevaVista) {
+            try {
+                if (nuevaVista === "inicio") {
+                    if (window.location.hash !== "#inicio") {
+                        ignorarSiguientePopstate = true;
+                        history.replaceState({ vista: "inicio" }, "", "#inicio");
+                    }
+                } else {
+                    history.pushState({ vista: nuevaVista }, "", "#" + nuevaVista);
+                }
+            } catch (e) {}
+        }
 
         function iniciarSecuenciaBienvenida() {
             state.faseInicio = "animando";
@@ -380,6 +452,23 @@
         function guardarValidacionesLocal() {
             try {
                 localStorage.setItem(STORAGE_VALIDACIONES, JSON.stringify(state.validaciones));
+            } catch (e) {}
+        }
+
+        function cargarOcultosLocal() {
+            try {
+                const raw = localStorage.getItem(STORAGE_OCULTOS);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (parsed && typeof parsed === "object") return parsed;
+                }
+            } catch (e) {}
+            return {};
+        }
+
+        function guardarOcultosLocal() {
+            try {
+                localStorage.setItem(STORAGE_OCULTOS, JSON.stringify(state.ocultosEnLista));
             } catch (e) {}
         }
 
@@ -617,6 +706,8 @@
         window.restaurarOcultosEnLista = function() {
             const ctx = claveContextoLista();
             state.ocultosEnLista[ctx] = [];
+            guardarOcultosLocal();
+            set(ref(db, `validafuturoApp/ocultosEnLista/${ctx}`), null).catch(() => {});
             mostrarToast("Trabajadores ocultos restaurados en la lista");
             render();
         };
@@ -674,6 +765,9 @@
             if (!actual.includes(ced)) {
                 state.ocultosEnLista[ctx] = [...actual, ced];
             }
+            guardarOcultosLocal();
+            set(ref(db, `validafuturoApp/ocultosEnLista/${ctx}/${ced}`), true).catch(() => {});
+
             state.menuFilaAbiertaCedula = "";
             mostrarToast(`Quitado de la lista (${ced}). El trabajador sigue en el sistema.`);
             render();
@@ -696,7 +790,8 @@
             }
         };
 
-        window.irVista = function(nuevaVista, tipoBono = null) {
+        window.irVista = function(nuevaVista, tipoBono = null, pushHist = true) {
+            const vistaAnterior = state.vista;
             detenerEscanerQR();
             state.vista = nuevaVista;
             state.filtroEstadoBono = "todos";
@@ -720,6 +815,10 @@
                 state.cedulaRegistro = "";
                 state.nombresRegistro = "";
                 state.apellidosRegistro = "";
+            }
+
+            if (pushHist && vistaAnterior !== nuevaVista) {
+                registrarEstadoHistorial(nuevaVista);
             }
             render();
         };
@@ -1245,6 +1344,24 @@
                 }
             });
 
+            onValue(ref(db, "validafuturoApp/ocultosEnLista"), (snapshot) => {
+                if (!snapshot.exists()) return;
+                const raw = snapshot.val();
+                if (!raw || typeof raw !== "object") return;
+                const nubeOcultos = {};
+                Object.entries(raw).forEach(([ctxKey, cedMap]) => {
+                    if (cedMap && typeof cedMap === "object") {
+                        nubeOcultos[ctxKey] = Object.entries(cedMap)
+                            .filter(([, val]) => Boolean(val))
+                            .map(([cedKey]) => normalizarCedula(cedKey))
+                            .filter(Boolean);
+                    }
+                });
+                state.ocultosEnLista = { ...state.ocultosEnLista, ...nubeOcultos };
+                guardarOcultosLocal();
+                render();
+            });
+
             onValue(ref(db, "enviosPendientesAdmin"), (snapshot) => {
                 state.enviosPendientesAdmin = snapshot.exists() ? (snapshot.val() || {}) : {};
                 render();
@@ -1285,6 +1402,7 @@
 
         aplicarModo(state.modoOscuro);
         aplicarTema(state.temaId);
+        inicializarHistorialNavegacion();
         initFirebaseTrabajadores();
         iniciarSecuenciaBienvenida();
         render();
