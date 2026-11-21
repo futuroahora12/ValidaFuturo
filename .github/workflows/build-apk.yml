@@ -40,6 +40,33 @@ jobs:
           npx cap add android || true
           npx cap sync android
 
+      - name: Set ValidaFuturo icon with navy background
+        run: |
+          curl -fsSL "https://i.postimg.cc/jjgTMcBp/BCV-20261120-191902-0000.png" -o raw_logo.png
+          convert raw_logo.png -resize 340x340 -background "#0b0e1c" -gravity center -extent 512x512 logo_validafuturo.png
+          for dir in android/app/src/main/res/mipmap-*; do
+            if [ -d "$dir" ]; then
+              cp logo_validafuturo.png "$dir/ic_launcher.png"
+              cp logo_validafuturo.png "$dir/ic_launcher_round.png"
+              cp logo_validafuturo.png "$dir/ic_launcher_foreground.png"
+            fi
+          done
+          mkdir -p android/app/src/main/res/values android/app/src/main/res/mipmap-anydpi-v26
+          cat << 'EOF' > android/app/src/main/res/values/ic_launcher_background.xml
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+              <color name="ic_launcher_background">#0b0e1c</color>
+          </resources>
+          EOF
+          cat << 'EOF' > android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
+          <?xml version="1.0" encoding="utf-8"?>
+          <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+              <background android:drawable="@color/ic_launcher_background"/>
+              <foreground android:drawable="@mipmap/ic_launcher_foreground"/>
+          </adaptive-icon>
+          EOF
+          cp android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
+
       - name: Build Android APK
         run: |
           cd android
