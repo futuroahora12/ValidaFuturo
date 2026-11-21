@@ -43,7 +43,20 @@ jobs:
       - name: Set ValidaFuturo icon with navy background
         run: |
           curl -fsSL "https://i.postimg.cc/jjgTMcBp/BCV-20261120-191902-0000.png" -o raw_logo.png
-          convert raw_logo.png -resize 340x340 -background "#0b0e1c" -gravity center -extent 512x512 logo_validafuturo.png
+          python3 - << 'PYEOF'
+          import shutil
+          try:
+              from PIL import Image
+              bg = Image.new("RGBA", (512, 512), (11, 14, 28, 255))
+              fg = Image.open("raw_logo.png").convert("RGBA")
+              fg.thumbnail((340, 340), Image.Resampling.LANCZOS)
+              x = (512 - fg.width) // 2
+              y = (512 - fg.height) // 2
+              bg.paste(fg, (x, y), fg)
+              bg.convert("RGB").save("logo_validafuturo.png", "PNG")
+          except Exception:
+              shutil.copyfile("raw_logo.png", "logo_validafuturo.png")
+          PYEOF
           for dir in android/app/src/main/res/mipmap-*; do
             if [ -d "$dir" ]; then
               cp logo_validafuturo.png "$dir/ic_launcher.png"
