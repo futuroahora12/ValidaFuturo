@@ -40,18 +40,35 @@ jobs:
           npx cap add android || true
           npx cap sync android
 
-      - name: Set ValidaFuturo icon with navy background
+      - name: Configure Android camera permission
+        run: |
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          if [ -f "$MANIFEST" ] && ! grep -q "android.permission.CAMERA" "$MANIFEST"; then
+            python3 - << 'PYEOF'
+          path = "android/app/src/main/AndroidManifest.xml"
+          with open(path, "r", encoding="utf-8") as f:
+              content = f.read()
+          perm = '    <uses-permission android:name="android.permission.CAMERA" />\n'
+          if "<manifest" in content and ">" in content:
+              idx = content.find(">", content.find("<manifest")) + 1
+              content = content[:idx] + "\n" + perm + content[idx:]
+              with open(path, "w", encoding="utf-8") as f:
+                  f.write(content)
+          PYEOF
+          fi
+
+      - name: Set ValidaFuturo icon with white background
         run: |
           rm -f raw_logo.png logo_validafuturo.png
-          curl -fsSL "https://i.postimg.cc/nL2Dhygm/BCV-20261120-191902-0000.png" -o raw_logo.png || true
+          curl -fsSL "https://i.postimg.cc/G361Hq02/BCV-20261120-191902-0000.png" -o raw_logo.png || true
           python3 - << 'PYEOF'
           import os, shutil
           size = 512
-          navy = (11, 14, 28, 255)
+          white = (255, 255, 255, 255)
           has_remote = os.path.exists("raw_logo.png") and os.path.getsize("raw_logo.png") > 100
           try:
               from PIL import Image, ImageDraw
-              bg = Image.new("RGBA", (size, size), navy)
+              bg = Image.new("RGBA", (size, size), white)
               if has_remote:
                   fg = Image.open("raw_logo.png").convert("RGBA")
                   fg.thumbnail((340, 340), Image.Resampling.LANCZOS)
@@ -89,7 +106,7 @@ jobs:
           cat << 'EOF' > android/app/src/main/res/values/ic_launcher_background.xml
           <?xml version="1.0" encoding="utf-8"?>
           <resources>
-              <color name="ic_launcher_background">#0b0e1c</color>
+              <color name="ic_launcher_background">#ffffff</color>
           </resources>
           EOF
           cat << 'EOF' > android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
