@@ -72,16 +72,19 @@ jobs:
                       f.write(b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02\x00\x00\x00\x90wS\xde\x00\x00\x00\x0cIDATx\x9cc\x10\x17\x39\x00\x01\x15\x00\x09\xe1\xfd\x8b\x00\x00\x00\x00IEND\xaeB`\x82")
           PYEOF
           for dir in android/app/src/main/res/mipmap-*; do
-            if [ -d "$dir" ]; then
-              cp logo_validafuturo.png "$dir/ic_launcher.png"
-              cp logo_validafuturo.png "$dir/ic_launcher_round.png"
-              cp logo_validafuturo.png "$dir/ic_launcher_foreground.png"
-            fi
+            case "$dir" in
+              *anydpi*)
+                rm -f "$dir"/ic_launcher*.png "$dir"/ic_launcher*.xml
+                ;;
+              *)
+                if [ -d "$dir" ]; then
+                  cp logo_validafuturo.png "$dir/ic_launcher.png"
+                  cp logo_validafuturo.png "$dir/ic_launcher_round.png"
+                  cp logo_validafuturo.png "$dir/ic_launcher_foreground.png"
+                fi
+                ;;
+            esac
           done
-          rm -f android/app/src/main/res/mipmap-anydpi/ic_launcher.xml \
-                android/app/src/main/res/mipmap-anydpi/ic_launcher_round.xml \
-                android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml \
-                android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
           mkdir -p android/app/src/main/res/values android/app/src/main/res/mipmap-anydpi-v26
           cat << 'EOF' > android/app/src/main/res/values/ic_launcher_background.xml
           <?xml version="1.0" encoding="utf-8"?>
